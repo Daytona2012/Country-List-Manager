@@ -1,0 +1,149 @@
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.IOException;
+
+	public class CountryIO {
+
+	   ArrayList<String> arrList = new ArrayList<String>(200);
+	   /*This variable will keep track of the number of countries in the ArrayList*/
+	   int listSize = 0;
+	   /*This variable will help us to make sure that the ArrayList is set only once if "countries.txt" file already exists.*/
+	   int firstReadFlag = 0;
+
+	   public static void main(String[] args) throws IOException {
+
+	       CountryIO obj = new CountryIO();
+	       Scanner inp = new Scanner(System.in);
+	       String ch;
+	       String coun = new String();
+	      
+	       System.out.println("Country List Manager\n");
+	       System.out.println("COMMAND MENU:\n1 - List Countries\n2 - Add a Country\n3 - Exit");
+
+	       while(true) {
+
+	           System.out.print("\nEnter menu number: ");
+	           ch = inp.next();
+	           switch(ch) {
+
+	               case "1":
+	                   /*Case 1: calls getCountries() method that sets ArrayList from "countries.txt" file and Displays the whole ArrayList*/
+	                   obj.getCountries();
+	                   System.out.println("ListSize: " + obj.listSize);
+	                   for(int i=0;i<obj.listSize;i++) {
+	                       System.out.println(obj.arrList.get(i));
+	                   }
+	                   break;
+	               case "2":
+	                   /*Case 2: Adds User-Entered Country on the the ArrayList and calls the saveCountries() method that saves the ArrayList in the "countries.txt" file*/
+	                   System.out.print("Enter country: ");
+	                   coun = inp.next();
+	                   obj.arrList.add(coun);
+	                   obj.listSize++;
+	                   if(obj.saveCountries(obj.arrList)) {
+	                       System.out.println("This country has been saved.");
+	                   }
+	                   break;
+	               case "3":
+	                   System.out.println("Goodbye.");
+	                   inp.close();
+	                   System.exit(0);
+	               default:
+	                   System.out.println("Please Enter a Valid Menu Number. ");
+	           }
+
+	       }
+
+	   }
+
+	   /*This method will set the ArrayList with the Country names from "countries.txt" file.*/
+	   /*If "countries.txt" file does not exists, it will make a new file named "countries.txt".*/
+	   /*All this is done within try...catch blocks to handle majority of the exceptions.*/
+	   public ArrayList<String> getCountries() throws IOException{
+
+	       FileReader readFile = null;
+	       BufferedReader readBuff = null;
+	       try {
+
+	           readFile = new FileReader("countries.txt");
+	           readBuff = new BufferedReader(readFile);
+	           if(firstReadFlag == 0) {
+
+	               String line = new String();
+	               int i = 0;
+	               while((line = readBuff.readLine()) != null && i<195) {
+	          
+	                   line = line.trim();
+	                   this.arrList.add(line);
+	                   i++;
+
+	               }
+	               this.listSize = this.arrList.size();
+	               readBuff.close();
+	               readFile.close();
+	               firstReadFlag = 1;
+
+	           }
+
+	       } catch(IOException iexcep) {
+
+	           FileWriter writeFile = null;
+	           BufferedWriter writeBuff = null;
+	           try {
+
+	               writeFile = new FileWriter("countries.txt");
+	               writeBuff = new BufferedWriter(writeFile);
+
+	           } catch(IOException oexcep) {
+
+	               System.out.println("\nCannot create \"countries.txt\" file. Exiting...");
+	               System.exit(0);
+
+	           }
+	           firstReadFlag = 1;
+	           writeBuff.close();
+	           writeFile.close();
+	           System.out.println("\nNo existing file named \"countries.txt\" was found.\nCreated a new file named \"countries.txt\"");
+
+	       }
+
+	       return this.arrList;
+	   }
+
+	   /*This method will save the ArrayList into "countries.txt" file.*/
+	   public boolean saveCountries(ArrayList<String> countries) throws IOException {
+
+	       FileWriter writeFile = null;
+	       BufferedWriter writeBuff = null;
+	       try {
+
+	           writeFile = new FileWriter("countries.txt");
+	           writeBuff = new BufferedWriter(writeFile);
+
+	       } catch(IOException oexcep) {
+
+	           System.out.println("\nCannot find nor create \"countries.txt\" file. Exiting...");
+	           System.exit(0);
+
+	       }
+
+	       String line = new String();
+	       for(int i=0;i<this.listSize;i++) {
+	          
+	           line = this.arrList.get(i);
+	           writeBuff.write(line);
+	           writeBuff.newLine();
+
+	       }
+
+	       writeBuff.close();
+	       writeFile.close();
+
+	       return true;
+	   }
+}
+
